@@ -1,12 +1,12 @@
-// src/pages/Login.tsx
-// Why: This component provides a login form for existing users.
+// src/pages/Register.tsx
+// Why: This component provides a registration form for new users.
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuthStore } from '../store/authStore';
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -21,17 +21,17 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      // Why: Call our backend's login endpoint.
-      const response = await api.post('/auth/login', { email, password });
+      // Why: Call our backend's registration endpoint.
+      const response = await api.post('/auth/register', { email, password });
       
-      // Why: Use the login function from our Zustand store to save the token and user.
-      login(response.data.token, response.data.data);
+      // Why: If registration is successful, log the user in automatically.
+      login(response.data.token, { email });
 
-      // Why: Redirect to the projects page after successful login.
+      // Why: Redirect to the projects page after successful registration.
       navigate('/projects');
     } catch (err: unknown) {
-      // Why: Handle API errors from the backend.
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Login failed. Please check your credentials.';
+      // Why: Handle API errors and display a user-friendly message.
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Registration failed. Please try again.';
       setError(message);
     } finally {
       setLoading(false);
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto p-8 rounded-lg shadow-xl bg-gray-800 border border-gray-700 mt-10">
-      <h1 className="text-4xl font-bold text-center mb-6 text-teal-300">Login</h1>
+      <h1 className="text-4xl font-bold text-center mb-6 text-teal-300">Register</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-gray-400 mb-2">Email</label>
@@ -68,11 +68,11 @@ const Login: React.FC = () => {
           disabled={loading}
           className="w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-gray-600"
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Register;
